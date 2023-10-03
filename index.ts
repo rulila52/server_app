@@ -32,5 +32,4 @@ router.post({
 });
 
 application.addRouter({ router });
-
 application.listen({ port: +PORT, callback: () => console.log(`Server started!`) });
