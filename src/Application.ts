@@ -1,5 +1,5 @@
 import EventEmitter from 'events';
-import http, { Server } from 'http';
+import http, { IncomingMessage, Server } from 'http';
 import { Router } from './Router.js';
 
 type GetRouteMaskProps = {
@@ -38,13 +38,16 @@ export class Application {
 
     #createServer = () =>
         http.createServer((req, res) => {
-            const emitted = this.#emitter.emit(
-                this.#getRouteMask({ path: req.url, method: req.method }),
-                req,
-                res
-            );
-            if (!emitted) {
+            let body = '';
+            req.on('data', (chunk) => (body += chunk));
+            req.on('end', (chunk) => {
+                const emitted = this.#emitter.emit(
+                    this.#getRouteMask({ path: req.url, method: req.method }),
+                    { ...req, body: body ? JSON.parse(body) : undefined },
+                    res
+                );
+                if (emitted) return;
                 res.end();
-            }
+            });
         });
 }

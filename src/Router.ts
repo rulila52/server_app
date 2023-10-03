@@ -1,13 +1,15 @@
 import { IncomingMessage, ServerResponse } from 'http';
 
+type MessageWithBody = IncomingMessage & { body: any };
+
 type RequestProps = {
     method?: string;
     path: string;
-    handler: (req: IncomingMessage, res: ServerResponse) => void;
+    handler: (req: MessageWithBody, res: ServerResponse) => void;
 };
 
 export class Router {
-    endpoints: Record<string, Record<string, (req: IncomingMessage, res: ServerResponse) => any>>;
+    endpoints: Record<string, Record<string, (req: MessageWithBody, res: ServerResponse) => any>>;
 
     constructor() {
         this.endpoints = {};
